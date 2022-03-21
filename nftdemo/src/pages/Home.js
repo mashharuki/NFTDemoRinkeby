@@ -18,6 +18,10 @@ const Home = () => {
     // 諸々必要なステート変数を宣言
     const [ totalsupply, setTotalSupply ] = useState(0);
     const [ nftAddress, setNftAddress] = useState("0x85e3F0f512a2E67A6CC962376b3FDaFBdAC398eb");
+    const [ mintRole, setMintRole ] = useState("0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6");
+    const [ nftName, setNftName ] = useState("Test");
+    const [ description, setDescription ] = useState("This is test NFT!!");
+    const [ nftUrl, setNftUrl ] = useState("https://www.instagram.com/p/CZjvN6-Jjv7/");
     const [ metaMaskFlag, setMetaMaskFlag ] = useState(false);
     const [ web3, setWeb3 ] = useState(null);
     const [ accounts, setAccounts ] = useState(null);
@@ -52,9 +56,29 @@ const Home = () => {
     /**
      * 「MINT」ボタンを押した時の処理
      */
-    const mintButton = () => {
+    const mintButton = async () => {
         // NFTコントラクト情報を取得する。
-        
+        const provider = await detectEthereumProvider();
+        const web3 = new Web3(provider);
+        const instance = new web3.eth.Contract(NFTContract.abi, nftAddress);
+        console.log("instace:", instance);
+
+        try {
+            // 呼び出したアドレスに対して権限を付与する。
+            await instance.methods.grantRole(mintRole, accounts[0]).send({
+                from: accounts[0],
+                gas: 200000
+            });
+            // NFTを発行する。
+            await instance.methods.mintNft(accounts[0], nftName, description, nftUrl).send({
+                from: accounts[0],
+                gas:200000
+            });
+            alert("Mint Success!!!")
+        } catch (error) {
+            alert("Mint failed");
+            console.error(error);
+        }
     }
 
     // アカウントが切り替わったら画面を更新する。

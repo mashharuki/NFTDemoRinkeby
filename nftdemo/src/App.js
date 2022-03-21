@@ -16,7 +16,7 @@ import Typography  from '@mui/material/Typography';
  */
 function App() {
   // スタイルシートを使用するための設定
-  const classes = useStyles()
+  const classes = useStyles();
 
   return (
     <Router>
